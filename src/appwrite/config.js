@@ -37,27 +37,20 @@ export class Service {
    * @param {Object} post - Post data
    * @returns {Promise<Object>} Created document
    */
-  async createPost(post) {
-    try {
-      const { title, slug, content, featuredImage, status, userId } = post;
-      return await this.databases.createDocument(
-        conf.appwriteDatabaseId,
-        conf.appwriteCollectionId,
-        ID.unique(),
-        {
-          title,
-          slug,
-          content,
-          featuredImage,
-          status,
-          userId,
-        }
-      );
-    } catch (error) {
-      console.error("[Service] createPost error:", error.message);
-      throw new Error(`Failed to create post: ${error.message}`);
-    }
+async createPost({ title, slug, content, featuredImage, status, userId }) {
+  try {
+    return await this.databases.createDocument(
+      conf.appwriteDatabaseId,
+      conf.appwriteCollectionId,
+      ID.unique(),
+      { title, slug, content, featuredImage, status, userId },
+      [`user:${userId}`]  // 👈 This is the key: only this user can write (update/delete)
+    );
+  } catch (error) {
+    console.error("Service :: createPost :: error", error);
+    throw error;
   }
+}
 
   /**
    * Update an existing post.
