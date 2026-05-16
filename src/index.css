@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+/* Better line heights on mobile */
+@media (max-width: 640px) {
+  body {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 1.875rem; /* 3xl on mobile slightly smaller */
+  }
+}
+
+/* Ensure images never overflow */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
