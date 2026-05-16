@@ -1,0 +1,10 @@
+{
+  "id": "your_site_id",  
+  "name": "React Blog",
+  "routes": [
+    {
+      "type": "fallback",
+      "value": "/"
+    }
+  ]
+}
