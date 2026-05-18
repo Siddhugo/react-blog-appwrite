@@ -1,170 +1,176 @@
 # 📝 React Blog with Appwrite
 
-A full-featured blog platform built using **React**, **Appwrite**, and **Tailwind CSS**.  
-This project includes authentication, blog management, rich text editing, image uploads, protected routes, and a fully responsive UI.
+A full‑featured blog platform built with **React**, **Appwrite**, and **Tailwind CSS**.  
+Includes authentication, blog management, rich text editing, image uploads, dark mode, protected routes, and document‑level permissions – all working on **Appwrite free tier**.
 
 ---
 
-# ✨ Features
+## ✨ Features
 
 - 🔐 User Authentication (Signup / Login / Logout)
-- 📝 Create, Edit, and Delete Blog Posts
-- 🖼️ Featured Image Upload using Appwrite Storage
-- ✍️ Rich Text Editor Integration (Self-hosted TinyMCE)
-- 🔒 Protected Routes based on authentication status
-- ⚡ Redux Toolkit State Management
-- 🌐 SEO-Friendly Slug Generation
-- 📱 Fully Responsive Mobile-First Design
-- ✅ Form Validation using React Hook Form
-- 🚨 Error Handling and Loading Skeletons
+- 📝 Create, Edit, and Delete Blog Posts (only author can edit/delete)
+- 🖼️ Featured Image Upload (Appwrite Storage)
+- ✍️ Rich Text Editor (TinyMCE with free GPL license)
+- 🌓 Dark / Light Mode (persists in localStorage)
+- 🔒 Protected Routes – guests are redirected to login
+- 📅 Automatic post creation & update dates
+- ⚡ Redux Toolkit for auth state
+- 🌐 SEO‑friendly slug generation
+- 📱 Fully responsive (mobile‑first design)
+- ✅ Form validation with React Hook Form
+- 🚨 Error handling & loading skeletons
 
 ---
 
-# 🛠️ Tech Stack
+## 🛠️ Tech Stack
 
-| Category | Technology |
-|---|---|
-| Frontend | React 18 + Vite |
-| Routing | React Router DOM v6 |
-| State Management | Redux Toolkit |
-| Styling | Tailwind CSS |
-| Backend (BaaS) | Appwrite |
-| Forms | React Hook Form |
-| Editor | TinyMCE (Self-hosted) |
+| Category       | Technology                         |
+|----------------|------------------------------------|
+| Frontend       | React 18 + Vite                    |
+| Routing        | React Router DOM v6                |
+| State          | Redux Toolkit                      |
+| Styling        | Tailwind CSS v4 + `@tailwindcss/vite` |
+| Backend (BaaS) | Appwrite (free tier)               |
+| Forms          | React Hook Form                    |
+| Editor         | TinyMCE (self‑hosted / GPL)        |
 
 ---
 
-# 🚀 Getting Started
+## 🚀 Getting Started
 
-## Prerequisites
+### Prerequisites
 
 - Node.js 18+
-- npm
-- Appwrite Account
+- npm or yarn
+- Appwrite account (free tier works)
 
-Create a free Appwrite account:
-
-[Appwrite Cloud](https://cloud.appwrite.io)
+Create a free Appwrite project at [cloud.appwrite.io](https://cloud.appwrite.io).
 
 ---
 
-# 📦 Installation
-
-## 1️⃣ Clone Repository
+### 1️⃣ Clone Repository
 
 ```bash
 git clone https://github.com/Siddhugo/react-blog-appwrite.git
 cd react-blog-appwrite
-```
-
-## 2️⃣ Install Dependencies
-
-```bash
+2️⃣ Install Dependencies
+bash
 npm install
-```
+3️⃣ Environment Variables
+Create a .env file in the root directory:
 
-## 3️⃣ Setup Environment Variables
-
-Create a `.env` file in the root directory and add:
-
-```env
+env
 VITE_APPWRITE_URL=https://cloud.appwrite.io/v1
 VITE_APPWRITE_PROJECT_ID=your_project_id
 VITE_APPWRITE_DATABASE_ID=your_database_id
 VITE_APPWRITE_COLLECTION_ID=your_collection_id
 VITE_APPWRITE_BUCKET_ID=your_bucket_id
-```
+Never commit .env – add it to .gitignore.
 
-## 4️⃣ Run Development Server
-
-```bash
+4️⃣ Run Development Server
+bash
 npm run dev
-```
+Open: http://localhost:5173
 
-Open:
+🗄️ Appwrite Backend Setup
+Database Collection: posts
+Attribute	Type	Required
+title	string	Yes
+slug	string	Yes
+content	string	Yes
+featuredImage	string	No
+status	string	Yes
+userId	string	Yes
+Storage Bucket
+Create a bucket for blog images.
+Recommended collection‑level permissions:
 
-```text
-http://localhost:5173
-```
+Read: users (only logged‑in users) – document permissions override
 
----
+Write: users
 
-# 🗄️ Appwrite Backend Setup
+Update: (leave empty)
 
-## Database Collection: `posts`
+Delete: (leave empty)
 
-| Attribute | Type | Required |
-|---|---|---|
-| title | string | Yes |
-| slug | string | Yes |
-| content | string | Yes |
-| featuredImage | string | No |
-| status | string | Yes |
-| userId | string | Yes |
+Document‑level permissions are set in the code so that only the author can update/delete their own posts.
 
----
+Authentication Settings
+Add your frontend URL (e.g., http://localhost:5173) to:
 
-## Storage Bucket
-
-Create a storage bucket for blog images.
-
-Recommended Permissions:
-
-- Read → Users & Guests
-- Write → Authenticated Users
-
----
-
-## Authentication Settings
-
-Add your frontend URL to:
-
-```text
+text
 Auth → Settings → Allowed Hosts
-```
+🧪 Testing the App
+After setup, test these flows:
 
----
+Sign up / Login
 
-# 📌 Additional Enhancements
+Create a post (with image)
 
-Compared to the base tutorial implementation, the following improvements were added:
+Edit the post (only author can)
 
-- Self-hosted TinyMCE integration
-- Improved slug generation
-- Better error handling
-- Responsive UI improvements
-- Loading skeletons
+Delete the post
 
----
+Log out – you’ll be redirected to login
 
-# 🙏 Acknowledgements
+Toggle dark mode – the UI adapts
 
-This project was inspired by the React + Appwrite course by  
-[Hitesh Choudhary (Chai aur Code)](https://www.youtube.com/watch?v=IdlF1zsUN3M).
+Creation / update dates appear on post cards and single post view
 
-Additional features and improvements were implemented independently for enhanced usability and production readiness.
+📌 Key Improvements Over Base Tutorial
+The original tutorial code was extended and fixed to be fully production‑ready:
 
----
+Issue	Fix
+Any logged‑in user could edit/delete any post	Document‑level permissions using Permission.read("users"), Permission.update("user:ID"), Permission.delete("user:ID")
+Guests could see posts	Redirect to login in Home.jsx with Navigate
+Update post failed (401 Unauthorized)	Re‑apply permissions in updatePost with valid strings
+Dark mode missing	ThemeProvider context, Tailwind v4 @custom-variant dark
+No creation/update dates	Display $createdAt and $updatedAt with formatDate helper
+TinyMCE “paid” warning	Added license_key: "gpl" and promotion: false
+Image preview memory leak	Cleanup URL.revokeObjectURL in useEffect
+🚢 Deployment
+Vercel (recommended)
+Push code to GitHub.
 
-# 🤝 Contributing
+Import repo to vercel.com.
 
-Contributions, issues, and feature requests are welcome.
+Set Framework Preset to Vite.
 
-Feel free to fork the repository and submit a pull request.
+Add environment variables (same as .env).
 
----
+Deploy.
 
-# 👨‍💻 Author
+Netlify
+Push to GitHub.
 
-## Siddhartha Das Goswami
+Import to netlify.com.
 
-- GitHub: [github.com/Siddhugo](https://github.com/Siddhugo)
-- LinkedIn: [linkedin.com/in/siddhartha-dasgoswami-218875320](https://www.linkedin.com/in/siddhartha-dasgoswami-218875320/)
+Build command: npm run build, Publish directory: dist.
 
----
+Add environment variables.
 
-# ⭐ Support
+Deploy.
 
-If you found this project useful, consider giving it a ⭐ on GitHub.
+Important: The app relies on dark class on <html> – the ThemeProvider handles it, no extra config needed.
 
-Happy Coding 🚀
+🤝 Contributing
+Issues and pull requests are welcome.
+Please follow the existing code style.
+
+👨‍💻 Author
+Siddhartha Das Goswami
+
+GitHub: @Siddhugo
+
+LinkedIn: linkedin.com/in/siddhartha-dasgoswami-218875320
+
+🙏 Acknowledgements
+Inspired by the React + Appwrite course by
+Hitesh Choudhary (Chai aur Code).
+
+Additional fixes and features were implemented to make the app production‑ready and fully compatible with Appwrite’s free tier.
+
+⭐ Support
+If this project helped you, give it a star on GitHub ⭐
+
+Happy coding! 🚀
