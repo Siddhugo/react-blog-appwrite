@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+/* stylelint-disable-next-line at-rule-no-unknown */
+@custom-variant dark (&:where(.dark, .dark *));
 /* Better line heights on mobile */
 @media (max-width: 640px) {
   body {
@@ -19,4 +21,11 @@ img {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+/* Optional: smooth dark mode transition for background & text */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }

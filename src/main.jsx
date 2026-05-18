@@ -13,10 +13,9 @@ import AddPost from "./pages/AddPost.jsx";
 import Signup from "./pages/Signup.jsx";
 import EditPost from "./pages/EditPost.jsx";
 import Post from "./pages/Post.jsx";
-import AllPost from "./pages/AllPosts.jsx"; // Changed from AllPosts to AllPost
+import AllPost from "./pages/AllPosts.jsx";
 
 // Component Imports
-// Using the directory import (Vite will find index.jsx automatically)
 import { AuthLayout, Login } from "./components";
 
 const router = createBrowserRouter([
@@ -85,5 +84,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

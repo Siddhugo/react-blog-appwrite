@@ -9,13 +9,13 @@ const RTE = ({ name = "content", control, label, defaultValue = "", error }) => 
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={id} className="block mb-1 text-sm font-medium text-gray-700">
+        <label htmlFor={id} className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
       )}
       <div
         className={`border rounded-xl overflow-hidden transition ${
-          error ? "border-red-500" : "border-gray-300"
+          error ? "border-red-500" : "border-gray-300 dark:border-gray-600"
         }`}
       >
         <Controller
@@ -26,13 +26,15 @@ const RTE = ({ name = "content", control, label, defaultValue = "", error }) => 
             <Editor
               id={id}
               value={value}
-              tinymceScriptSrc="/tinymce/tinymce.min.js"
+              tinymceScriptSrc="/tinymce/tinymce.min.js" // or use CDN
               init={{
                 height: 400,
                 menubar: true,
-                license_key: "gpl",               // removes paid warning
-                promotion: false,                  // no upgrade button
+                license_key: "gpl",      // ✅ free tier – removes paid warning
+                promotion: false,         // no upgrade button
                 branding: false,
+                skin: document.documentElement.classList.contains("dark") ? "oxide-dark" : "oxide",
+                content_css: document.documentElement.classList.contains("dark") ? "dark" : "default",
                 plugins: [
                   "advlist", "autolink", "lists", "link", "image", "charmap", "preview",
                   "anchor", "searchreplace", "visualblocks", "code", "fullscreen",
@@ -48,7 +50,7 @@ const RTE = ({ name = "content", control, label, defaultValue = "", error }) => 
           )}
         />
       </div>
-      {error && <p className="text-red-500 text-sm mt-1">{error.message || error}</p>}
+      {error && <p className="text-red-500 dark:text-red-400 text-sm mt-1">{error.message || error}</p>}
     </div>
   );
 };

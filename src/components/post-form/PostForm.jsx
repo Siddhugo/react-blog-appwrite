@@ -17,9 +17,8 @@ const PostForm = ({ post }) => {
     setValue,
     getValues,
     control,
-    watch,
-    formState: { errors },
     trigger,
+    formState: { errors },
   } = useForm({
     defaultValues: {
       title: post?.title || "",
@@ -30,33 +29,32 @@ const PostForm = ({ post }) => {
     },
   });
 
-  // ✅ CORRECT slug transformation (full title to slug)
+  // Slug generator
   const slugTransform = useCallback((title) => {
     if (!title || typeof title !== "string") return "";
     return title
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")  // remove special chars
-      .replace(/\s+/g, "-")           // replace spaces with hyphens
-      .replace(/-+/g, "-")            // replace multiple hyphens with single
-      .replace(/^-|-$/g, "");         // trim hyphens from ends
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
   }, []);
 
-  // Auto-generate slug when title input loses focus (onBlur)
+  // Auto‑slug on title blur
   const handleTitleBlur = (e) => {
     const title = e.target.value;
     const currentSlug = getValues("slug");
-    // Only auto-generate if slug is empty or still matches previous auto value
     if (!currentSlug || currentSlug === slugTransform(getValues("title"))) {
-      const newSlug = slugTransform(title);
-      setValue("slug", newSlug, { shouldValidate: true });
+      setValue("slug", slugTransform(title), { shouldValidate: true });
     }
   };
 
-  // Image preview
+  // Image preview handling
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
       setImagePreview(URL.createObjectURL(file));
     } else {
       setImagePreview(null);
@@ -64,11 +62,24 @@ const PostForm = ({ post }) => {
     trigger("image");
   };
 
+  // Pre‑fill preview when editing existing post
+  useEffect(() => {
+    if (post?.featuredImage) {
+      setImagePreview(appwriteService.getFilePreview(post.featuredImage));
+    }
+    return () => {
+      if (imagePreview && imagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [post]);
+
   // Submit handler
   const submit = async (data) => {
+    console.log("Current userData:", userData);
+  console.log("User ID:", userData?.$id)
     setLoading(true);
     try {
-      // Ensure slug is never empty
       let finalSlug = data.slug?.trim();
       if (!finalSlug) {
         finalSlug = slugTransform(data.title);
@@ -77,12 +88,10 @@ const PostForm = ({ post }) => {
 
       let featuredImageId = post?.featuredImage || null;
 
-      // Upload new image if selected
       if (data.image && data.image[0]) {
         const file = await appwriteService.uploadFile(data.image[0]);
         if (file) {
           featuredImageId = file.$id;
-          // Delete old image if editing
           if (post?.featuredImage) {
             await appwriteService.deleteFile(post.featuredImage);
           }
@@ -99,7 +108,7 @@ const PostForm = ({ post }) => {
 
       let dbPost;
       if (post) {
-        dbPost = await appwriteService.updatePost(post.$id, payload);
+        dbPost = await appwriteService.updatePost(post.$id, payload, userData.$id);
       } else {
         dbPost = await appwriteService.createPost({
           ...payload,
@@ -115,7 +124,6 @@ const PostForm = ({ post }) => {
       alert("Error: " + error.message);
     } finally {
       setLoading(false);
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
     }
   };
 
@@ -158,13 +166,13 @@ const PostForm = ({ post }) => {
 
       <div className="w-full md:w-1/3 px-2 space-y-4">
         <div>
-          <label className="block mb-1 font-medium text-gray-700">
+          <label className="block mb-1 font-medium text-gray-700 dark:text-gray-200">
             Featured Image {!post && <span className="text-red-500">*</span>}
           </label>
           <input
             type="file"
             accept="image/*"
-            className="w-full px-3 py-2 border rounded-lg"
+            className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
             {...register("image", {
               required: !post && "Featured image is required",
             })}
@@ -175,14 +183,13 @@ const PostForm = ({ post }) => {
           )}
         </div>
 
-        {/* Image preview */}
         {(imagePreview || post?.featuredImage) && (
           <div className="mt-2">
-            <p className="text-sm font-medium text-gray-700 mb-1">Preview:</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preview:</p>
             <img
               src={imagePreview || appwriteService.getFilePreview(post.featuredImage)}
               alt="Preview"
-              className="w-full h-48 object-cover rounded-lg shadow-sm border"
+              className="w-full h-48 object-cover rounded-lg shadow-sm border dark:border-gray-600"
             />
           </div>
         )}

@@ -12,19 +12,6 @@ const Post = () => {
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
 
-  // Helper to format Appwrite datetime to a readable string
-  const formatDate = (datetime) => {
-    if (!datetime) return "Unknown date";
-    const date = new Date(datetime);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   useEffect(() => {
     const fetchPost = async () => {
       if (!slug) return navigate("/");
@@ -42,27 +29,34 @@ const Post = () => {
     fetchPost();
   }, [slug, navigate]);
 
-  const deletePost = async () => {
-    if (!post) return;
-    const status = await appwriteService.deletePost(post.$id);
-    if (status) {
-      if (post.featuredImage) await appwriteService.deleteFile(post.featuredImage);
-      navigate("/");
+ const deletePost = async () => {
+  if (!post) return;
+  const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+  if (!confirmDelete) return;
+  
+  const status = await appwriteService.deletePost(post.$id);
+  if (status) {
+    if (post.featuredImage) {
+      await appwriteService.deleteFile(post.featuredImage);
     }
-  };
+    navigate("/");
+  } else {
+    alert("Failed to delete post. You may not have permission.");
+  }
+};
 
-  const isAuthor = post && userData && post.userId === userData.$id;
+  const isAuthor = userData && post && post.userId === userData.$id;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10">
+      <div className="min-h-screen bg-gray-50 py-10">
         <Container>
           <div className="animate-pulse space-y-6">
-            <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+            <div className="h-80 bg-gray-200 rounded-xl"></div>
+            <div className="h-8 bg-gray-200 rounded w-1/2"></div>
             <div className="space-y-2">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+              <div className="h-4 bg-gray-200 rounded"></div>
+              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
             </div>
           </div>
         </Container>
@@ -77,7 +71,7 @@ const Post = () => {
     : "/placeholder-image.jpg";
 
   return (
-    <div className="py-8 min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="py-8 min-h-screen bg-gray-50">
       <Container>
         <div className="relative w-full mb-6 border rounded-xl overflow-hidden shadow">
           <img
@@ -97,24 +91,8 @@ const Post = () => {
             </div>
           )}
         </div>
-
-        {/* Title + Timestamps */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
-            {post.title}
-          </h1>
-          <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
-            <p>📅 Published: {formatDate(post.$createdAt)}</p>
-            {post.$updatedAt !== post.$createdAt && (
-              <p>✏️ Last edited: {formatDate(post.$updatedAt)}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Post content */}
-        <div className="prose max-w-full dark:prose-invert">
-          {parse(post.content)}
-        </div>
+        <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
+        <div className="prose max-w-full">{parse(post.content)}</div>
       </Container>
     </div>
   );

@@ -10,14 +10,14 @@ const Logo = ({ width = "120px", height = "auto", className = "" }) => {
     >
       <svg
         viewBox="0 0 40 40"
-        className="w-8 h-8 text-blue-600"
+        className="w-8 h-8 text-blue-600 dark:text-blue-400"
         fill="currentColor"
         aria-hidden="true"
       >
         <circle cx="20" cy="20" r="18" className="opacity-20" />
         <path d="M12 20L18 26L28 14" stroke="currentColor" strokeWidth="3" fill="none" />
       </svg>
-      <span className="text-xl font-bold text-gray-800 tracking-wide">
+      <span className="text-xl font-bold text-gray-800 dark:text-white tracking-wide">
         DevApp
       </span>
     </div>

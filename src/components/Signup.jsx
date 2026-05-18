@@ -9,31 +9,20 @@ import { useForm } from "react-hook-form";
 function Signup() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
-
   const [serverError, setServerError] = useState("");
 
   const create = async (data) => {
     setServerError("");
-
     try {
       const account = await authService.createAccount(data);
-
-      if (!account) {
-        throw new Error("Account creation failed");
-      }
-
+      if (!account) throw new Error("Account creation failed");
       const userData = await authService.getCurrentUser();
-
-      if (!userData) {
-        throw new Error("Unable to fetch user data");
-      }
-
+      if (!userData) throw new Error("Unable to fetch user data");
       dispatch(authLogin(userData));
       navigate("/");
     } catch (error) {
@@ -42,36 +31,23 @@ function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
-        {/* Logo */}
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4">
+      <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
         <div className="mb-6 flex justify-center">
-          <span className="inline-block w-full max-w-30">
-            <Logo width="100%" />
-          </span>
+          <Logo width="100%" />
         </div>
-
-        {/* Heading */}
-        <h2 className="text-center text-2xl font-bold">
+        <h2 className="text-center text-2xl font-bold text-gray-800 dark:text-white">
           Sign up to create account
         </h2>
-
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-medium text-blue-600 hover:underline transition"
-          >
+          <Link to="/login" className="font-medium text-blue-600 dark:text-blue-400 hover:underline">
             Sign In
           </Link>
         </p>
-
-        {/* Server Error */}
         {serverError && (
-          <p className="text-red-600 mt-6 text-center text-sm">{serverError}</p>
+          <p className="text-red-600 dark:text-red-400 mt-6 text-center text-sm">{serverError}</p>
         )}
-
-        {/* Form */}
         <form onSubmit={handleSubmit(create)} className="mt-8 space-y-5">
           <Input
             label="Full Name"
@@ -79,16 +55,9 @@ function Signup() {
             error={errors.name}
             {...register("name", {
               required: "Full name is required",
-              minLength: {
-                value: 3,
-                message: "Name must be at least 3 characters",
-              },
+              minLength: { value: 3, message: "Name must be at least 3 characters" },
             })}
           />
-          {errors.name && (
-            <p className="text-red-500 text-sm -mt-3">{errors.name.message}</p>
-          )}
-
           <Input
             label="Email"
             type="email"
@@ -102,10 +71,6 @@ function Signup() {
               },
             })}
           />
-          {errors.email && (
-            <p className="text-red-500 text-sm -mt-3">{errors.email.message}</p>
-          )}
-
           <Input
             label="Password"
             type="password"
@@ -113,18 +78,9 @@ function Signup() {
             error={errors.password}
             {...register("password", {
               required: "Password is required",
-              minLength: {
-                value: 6,
-                message: "Password must be at least 6 characters",
-              },
+              minLength: { value: 6, message: "Password must be at least 6 characters" },
             })}
           />
-          {errors.password && (
-            <p className="text-red-500 text-sm -mt-3">
-              {errors.password.message}
-            </p>
-          )}
-
           <Button
             type="submit"
             className="w-full"
