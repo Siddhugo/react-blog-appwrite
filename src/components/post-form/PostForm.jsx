@@ -172,7 +172,9 @@ const PostForm = ({ post }) => {
           <input
             type="file"
             accept="image/*"
-            className="w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600"
+            className="w-full px-3 py-2 
+             dark:text-gray-200
+            border rounded-lg dark:bg-gray-800 dark:border-gray-600"
             {...register("image", {
               required: !post && "Featured image is required",
             })}

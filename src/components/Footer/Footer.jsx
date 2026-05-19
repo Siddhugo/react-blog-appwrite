@@ -35,8 +35,8 @@ const Footer = React.memo(() => {
   ];
 
   return (
-    <footer 
-      className="relative bg-gray-100 border-t border-gray-300 py-10"
+    <footer
+      className="relative bg-gray-100 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 py-10 transition-colors duration-200"
       aria-label="Site footer"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -47,7 +47,7 @@ const Footer = React.memo(() => {
               <div className="mb-4 inline-flex items-center">
                 <Logo width="100px" />
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 &copy; {currentYear} DevUI. All rights reserved.
               </p>
             </div>
@@ -56,7 +56,7 @@ const Footer = React.memo(() => {
           {/* Sections */}
           {sections.map((section) => (
             <div key={section.title} className="w-full p-6 md:w-1/2 lg:w-2/12">
-              <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 {section.title}
               </h3>
               <ul className="space-y-2">
@@ -64,7 +64,7 @@ const Footer = React.memo(() => {
                   <li key={link.name}>
                     <Link
                       to={link.to}
-                      className="text-base font-medium text-gray-900 hover:text-gray-700 transition-colors"
+                      className="text-base font-medium text-gray-900 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 transition-colors"
                     >
                       {link.name}
                     </Link>

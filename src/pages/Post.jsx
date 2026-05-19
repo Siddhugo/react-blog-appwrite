@@ -5,6 +5,18 @@ import parse from "html-react-parser";
 import { Button, Container } from "../components";
 import appwriteService from "../appwrite/config";
 
+// Helper to format Appwrite dates
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 const Post = () => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,34 +41,31 @@ const Post = () => {
     fetchPost();
   }, [slug, navigate]);
 
- const deletePost = async () => {
-  if (!post) return;
-  const confirmDelete = window.confirm("Are you sure you want to delete this post?");
-  if (!confirmDelete) return;
-  
-  const status = await appwriteService.deletePost(post.$id);
-  if (status) {
-    if (post.featuredImage) {
-      await appwriteService.deleteFile(post.featuredImage);
+  const deletePost = async () => {
+    if (!post) return;
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      const status = await appwriteService.deletePost(post.$id);
+      if (status) {
+        if (post.featuredImage) await appwriteService.deleteFile(post.featuredImage);
+        navigate("/");
+      } else {
+        alert("Failed to delete post.");
+      }
     }
-    navigate("/");
-  } else {
-    alert("Failed to delete post. You may not have permission.");
-  }
-};
+  };
 
-  const isAuthor = userData && post && post.userId === userData.$id;
+  const isAuthor = post && userData && post.userId === userData.$id;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-10">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10">
         <Container>
           <div className="animate-pulse space-y-6">
-            <div className="h-80 bg-gray-200 rounded-xl"></div>
-            <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             <div className="space-y-2">
-              <div className="h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
             </div>
           </div>
         </Container>
@@ -68,10 +77,10 @@ const Post = () => {
 
   const imageUrl = post.featuredImage
     ? appwriteService.getFilePreview(post.featuredImage).toString()
-    : "/placeholder-image.jpg";
+    : "https://placehold.co/1200x600?text=No+Image";
 
   return (
-    <div className="py-8 min-h-screen bg-gray-50">
+    <div className="py-8 min-h-screen bg-gray-50 dark:bg-gray-900">
       <Container>
         <div className="relative w-full mb-6 border rounded-xl overflow-hidden shadow">
           <img
@@ -91,8 +100,22 @@ const Post = () => {
             </div>
           )}
         </div>
-        <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-        <div className="prose max-w-full">{parse(post.content)}</div>
+
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          {post.title}
+        </h1>
+
+        {/* 📅 Creation & update dates */}
+        <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <span>📅 Created: {formatDate(post.$createdAt)}</span>
+          {post.$updatedAt !== post.$createdAt && (
+            <span>✏️ Updated: {formatDate(post.$updatedAt)}</span>
+          )}
+        </div>
+
+        <div className="prose max-w-full dark:prose-invert">
+          {parse(post.content)}
+        </div>
       </Container>
     </div>
   );
